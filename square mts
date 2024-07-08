@@ -1,0 +1,70 @@
+(require 2htdp/image)
+(require 2htdp/universe)
+
+;;........CONSTANT................
+
+(define WIDTH 1000)
+(define HEIGHT 600)
+(define Cx (/ WIDTH 2))
+(define Cy (/ HEIGHT 2))
+(define MTS (empty-scene WIDTH HEIGHT))
+(define COLOR "red")
+(define SPEED 7)
+(define ANGLEASPEED 10)
+
+;;------------DATA DEFINTION----------- 
+(define-struct sqstate (size angle))
+;;rtsqur is a (make-rtsqur number number)
+;;intrep as. (make-rtsqur size angle) where
+;;-size is the size of square
+;;- angle is the angle of square
+
+(define S1(make-sqstate 10 20))
+(define S2 (make-sqstate 20 30))
+
+#;(define (fn-for-sqstate s)
+  (...(state-size s)
+      (sqstate-angle s)))
+
+;;-------------funtion definition-----------
+;;state->state
+;; give us next-state of the square 
+
+(check-expect (next-sqstate (make-sqstate 10 20 )) ( make-sqstate(+ 10 SPEED ) (+ 20 ANGLEASPEED)))
+(check-expect (next-sqstate (make-sqstate 20 30 )) (make-sqstate (+ 20 SPEED ) (+ 30 ANGLEASPEED)))
+
+  
+;;(define (next-square sa) (make-rtsqur 0 0 )   ;dummy functio4
+
+(define (next-sqstate s)
+  (make-sqstate (+ (sqstate-size s) SPEED)
+                (+ (sqstate-angle s) ANGLEASPEED)))
+
+;;------------------------------------------------
+;;rtsqur -> imsage
+;;render image on the screen
+
+(check-expect (render-image (make-sqstate 20 40))
+              (place-image (rotate 40 (square 20 "solid" COLOR)) Cx Cy MTS))
+(check-expect (render-image (make-sqstate 20 40))
+              (place-image (rotate 40 (square 20 "solid" COLOR)) Cx Cy  MTS))
+(check-expect (render-image (make-sqstate 80 50))
+              (place-image (rotate 50 (square 80 "solid" COLOR)) Cx Cy   MTS))
+              
+;;(define (render-image s) MTS )
+(define (render-image s)
+  (place-image (rotate (sqstate-angle s) (square (sqstate-size s) "solid" COLOR)) Cx Cy  MTS))
+
+
+(define (main s)
+  (big-bang s
+  (on-tick next-sqstate )
+  (to-draw render-image)))
+
+(main (make-sqstate 20 40))
+
+ 
+
+
+
+
